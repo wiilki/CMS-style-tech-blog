@@ -1,9 +1,28 @@
-<div class="text-center">
-  <h2>{{title}}</h2>
-  <p>{{description}}</p>
-  <p>Created by {{user.username}} on {{format_date date_created}}</p>
- 
-  <p>
-    <button class="btn btn-primary">Add a comment!</button>
-  </p>
+<div class='row mb'>
+  <div class='col-md'>
+    <h2>
+      {{title}}
+    </h2>
+    <p>
+      {{description}}
+    </p>
+    <p>
+      Created by {{user.username}} on {{format_date date_created}}
+    </p>
+  </div>
 </div>
+
+ {{#if logged_in}}
+<form class='form comment-form'>
+  <div class='form-group'>
+    <label for='comment-add'> Comment: </label>
+    <input class='form-input' type='text' id='comment-add' />
+  </div>
+
+  <div class='form-group'>
+    <button class='btn btn-primary' type='submit'>  Add Comment! </button>
+  </div>
+</form>
+ {{else}}
+ <a href="/login">Login</a>
+  {{/if}}
