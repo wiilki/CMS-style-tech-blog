@@ -34,13 +34,13 @@ router.get('/post/:id', async (req, res) => {
         {
           model: User,
           attributes: ['username'],
-        },
+        }
       ],
     });
 
     const post = postData.get({ plain: true });
 
-    res.render('post', {
+    res.render('displayPost', {
       ...post,
       logged_in: req.session.logged_in
     });
@@ -48,6 +48,8 @@ router.get('/post/:id', async (req, res) => {
     res.status(500).json(err);
   }
 });
+
+
 
 // Use withAuth middleware to prevent access to route
 router.get('/dashboard', withAuth, async (req, res) => {
