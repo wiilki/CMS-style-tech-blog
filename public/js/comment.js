@@ -1,7 +1,7 @@
 const commentFormHandler = async (event) => {
     event.preventDefault();
 
-    const body = document.querySelector('#').value.trim();
+    const body = document.querySelector('#comment-add').value.trim();
 
     if (body) {
         const response = await fetch(`/api/comments`, {
@@ -13,7 +13,7 @@ const commentFormHandler = async (event) => {
         });
 
         if (response.ok) {
-            document.location.replace('/');
+            document.location.replace('/home');
         } else {
             alert('Failed to create post');
         }
@@ -21,5 +21,5 @@ const commentFormHandler = async (event) => {
 };
 
 document
-    .querySelector('.new-post-form')
+    .querySelector('.comment-form')
     .addEventListener('submit', commentFormHandler);
