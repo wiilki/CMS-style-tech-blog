@@ -1,8 +1,6 @@
+const { Post } = require('../models');
 
-const { Po,
-  user_id: st } = require('../models');
-
-const postData = [
+const postData =  [
   {
     title: "Why MVC is so important",
     description: "MVC allows developers to maintain a true separation of concerns, devising their code between the Model layer for data, the View layer for design, and the Controller layer for application logic.",

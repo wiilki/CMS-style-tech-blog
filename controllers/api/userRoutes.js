@@ -3,8 +3,34 @@ const { User } = require('../../models');
 
 router.get('/', (req, res) => {
   User.findAll({})
-    .then(newUser => res.json(newUser))
-    .catch(err => {
+    .then((newUser) => res.json(newUser))
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json(err);
+    });
+});
+
+router.get('/:id', (req, res) => {
+  User.findOne({
+    where: { id: req.params.id },
+    include: [
+      { model: Post },
+      {
+        model: Comment,
+        include: {
+          model: Post,
+        },
+      },
+    ],
+  })
+    .then((userData) => {
+      if (!userData) {
+        res.status(404).json({ message: 'No user found with this id' });
+        return;
+      }
+      res.json(userData);
+    })
+    .catch((err) => {
       console.log(err);
       res.status(500).json(err);
     });
@@ -27,7 +53,9 @@ router.post('/', async (req, res) => {
 
 router.post('/login', async (req, res) => {
   try {
-    const userData = await User.findOne({ where: { username: req.body.username } });
+    const userData = await User.findOne({
+      where: { username: req.body.username },
+    });
 
     if (!userData) {
       res
@@ -48,10 +76,9 @@ router.post('/login', async (req, res) => {
     req.session.save(() => {
       req.session.user_id = userData.id;
       req.session.logged_in = true;
-      
+
       res.json({ user: userData, message: 'You are now logged in!' });
     });
-
   } catch (err) {
     res.status(400).json(err);
   }
