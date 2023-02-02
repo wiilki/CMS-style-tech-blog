@@ -21,7 +21,10 @@ const sess = {
     httpOnly: true,
     secure: false,
     sameSite: 'strict',
-  }
+  },
+  resave: true,
+  rolling: true,
+  saveUninitialized: true
 };
 
 app.use(session(sess));

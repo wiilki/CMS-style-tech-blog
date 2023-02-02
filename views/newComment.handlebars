@@ -1,10 +1,20 @@
-<form class='form comment-form'>
-  <div class='form-group'>
-    <label for='comment-add'> Comment: </label>
-    <input class='form-input' type='text' id='comment-add' />
+{{> postData post}}
+
+{{#if loggedIn}}
+<form class="comment-form">
+  <div>
+    <input id="comment-body" name="comment-body" placeholder="Comment here" />
   </div>
 
-  <div class='form-group'>
-    <button class='btn btn-primary' type='submit'> Add Comment! </button>
+  <div>
+    <button type="submit">Add Comment</button>
   </div>
+
 </form>
+{{/if}}
+
+{{> commentData post.comments}}
+
+{{#if loggedIn}}
+<script src="/js/newComment.js"></script>
+{{/if}}

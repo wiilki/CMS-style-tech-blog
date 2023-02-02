@@ -1,27 +1,18 @@
-<div class='col'>
-  <h3>
-    Create a New Post:
-  </h3>
+<a href="/dashboard">Go back</a>
 
-  <form class='form new-post-form'>
-    <div class='form-group'>
-      <label for='post-title'>
-        Title:
-      </label>
-      <input class='form-input' type='text' id='post-title' name='post-title' />
-    </div>
-    <div class='form-group'>
-      <label for='post-desc'>
-        Content:
-      </label>
-      <textarea class='form-input' id='post-desc' name='post-desc'></textarea>
-    </div>
-    <div class='form-group'>
-      <button type='submit' class='btn btn-primary'>
-        Create
-      </button>
-    </div>
-  </form>
-</div>
+<h2>New Post:</h2>
 
-<script src="./js/newPost.js"></script>
+<form class="new-post-form">
+  <div>
+    <label for="post-title">Title:</label>
+    <input class="input" type="text" id="post-title" name="post-title" placeholder="insert title here" />
+  </div>
+  <div>
+    <label for="post-content">Content:</label>
+    <input class="textarea is-large" id="post-content" name="post-content" placeholder="insert content here" />
+  </div>
+  <button type="submit">+ New Post</button>
+</form>
+
+
+<script src="/js/newPost.js"></script>

@@ -1,16 +1,19 @@
+<h2>Your Posts</h2>
 {{#if posts.length}}
-<div class="col">
-    <h3>Your Posts:</h3>
-
+<div>
     {{#each posts as |post|}}
-    {{> displayPost post}}
-    <div class="post-list">
-        <div class="col">
-            <button class="btn btn-danger" data-id="{{post.id}}">DELETE</button>
-        </div>
-    </div>
+
+    {{> postData post}}
+
+    <a href="/dashboard/edit/{{post.id}}"><button>Edit Post</button></a>
+
     {{/each}}
+
+    {{else}}
+    <h3>No Posts</h3>
 </div>
 {{/if}}
 
-<button type="submit"><a href="/posts">+ New Post</a></button>
+<a href="/dashboard/create/"><button id="create-post">+ New Post</button></a>
+
+<script src="/js/editPost.js"></script>

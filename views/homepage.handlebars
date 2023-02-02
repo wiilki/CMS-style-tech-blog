@@ -1,6 +1,7 @@
-<!-- Loop over each object in the posts array -->
-{{#each posts as |post| }}
+{{#each posts as |post|}}
 
-{{> displayPost post}}
+{{> postData post }}
 
+{{else}}
+<h3>No posts</h3>
 {{/each}}
