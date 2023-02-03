@@ -61,6 +61,6 @@ header h1 {
   flex-direction: row;
 }
 
-.login-form > * {
+.login-form > *, .signup-form > * {
   padding: 10px;
 }
