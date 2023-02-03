@@ -1,10 +1,12 @@
-<a href="/posts/{{id}}">
-    <div>
-        <h2> {{title}}</h2>
-        <p>Posted by {{user.username}} on {{format_date date_created}}</p>
-    </div>
+<div class="card border-dark">
+    <a href="/posts/{{id}}">
+        <div class="card-header bg-primary">
+            <h2> {{title}}</h2>
+            <p>Posted by {{user.username}} on {{format_date date_created}}</p>
+        </div>
 
-    <div>
-        <p> {{description}}</p>
-    </div>
-</a>
+        <div class="card-body">
+            <p> {{description}}</p>
+        </div>
+    </a>
+</div>

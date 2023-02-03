@@ -1,9 +1,8 @@
 {{#each this}}
-<div>
-  {{body}}
-</div>
-
-<div>
-  {{user.username}} on {{format_date date_created}}
+<div class="card border-dark">
+  <div class="comment-card">
+    <p>{{body}}</p>
+    <p>-{{user.username}}, {{format_date date_created}}</p>
+  </div>
 </div>
 {{/each}}

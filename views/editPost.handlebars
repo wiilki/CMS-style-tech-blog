@@ -11,11 +11,6 @@
     <label for="post-content">Content:</label>
     <input class="textarea" name="post-content" type="text" value="{{post.description}}" />
   </div>
-  <div>
-    created on {{format_date post.date_created}}
-    |
-    <a href="/posts/{{post.id}}">{{post.comments.length}} {{format_plural "comment" post.comments.length}}</a>
-  </div>
   <button type="submit">Update Post</button>
 </form>
 
