@@ -1,6 +1,8 @@
 {{#each posts as |post|}}
 
-{{> postData post }}
+<a href="/posts/{{id}}">
+    {{> postData post }}
+</a>
 
 {{else}}
 <h3>No posts</h3>

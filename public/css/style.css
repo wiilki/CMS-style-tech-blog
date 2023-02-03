@@ -4,7 +4,7 @@ header, .post:not(:last-child) {
 }
 
 a, p, h1, h2, h3 {
-  padding: 10px;
+  padding: 5px;
 }
 
 .no-button {
@@ -49,11 +49,11 @@ header h1 {
 }
 
 .card {
-  margin: 30px;
+  margin: 10px 30px;
 }
 
 .comment-card {
-  padding: 20px;
+  padding: 10px;
 }
 
 .card-header {
@@ -63,4 +63,8 @@ header h1 {
 
 .login-form > *, .signup-form > * {
   padding: 10px;
+}
+
+.new-post-btn {
+  justify-content: center;
 }

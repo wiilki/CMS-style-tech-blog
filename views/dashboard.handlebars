@@ -3,11 +3,9 @@
 {{#if posts.length}}
 <div>
     {{#each posts as |post|}}
-
-    {{> postData post}}
-
-    <a href="/dashboard/edit/{{post.id}}"><button>Edit Post</button></a>
-
+    <a href="/dashboard/edit/{{post.id}}">
+        {{> postData post}}
+    </a>
     {{/each}}
 
     {{else}}

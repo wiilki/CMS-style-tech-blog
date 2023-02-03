@@ -1,19 +1,20 @@
 {{> postData post}}
 
-{{#if loggedIn}}
-<form class="comment-form">
-  <div>
-    <input id="comment-body" name="comment-body" placeholder="Comment here" />
-  </div>
-
-  <div>
-    <button type="submit">Add Comment</button>
-  </div>
-
-</form>
-{{/if}}
-
 {{> commentData post.comments}}
+
+{{#if loggedIn}}
+<div class="card border-dark">
+  <form class="comment-form">
+    <div>
+      <textarea name="comment-body"></textarea>
+    </div>
+
+    <div>
+      <button type="submit">Add Comment</button>
+    </div>
+  </form>
+</div>
+{{/if}}
 
 {{#if loggedIn}}
 <script src="/js/newComment.js"></script>
