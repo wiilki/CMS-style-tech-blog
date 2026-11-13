@@ -22,6 +22,12 @@ app.engine("handlebars", hbs.engine);
 app.set("view engine", "handlebars");
 app.use(express.json({ limit: "100kb" }));
 app.use(express.urlencoded({ extended: false, limit: "100kb" }));
+// Vercel imports the Express app as a serverless handler. Wait for storage
+// initialization before its session middleware handles the first request.
+if (process.env.VERCEL) {
+  const ready = sequelize.authenticate().then(() => sequelize.sync()).then(() => store.sync());
+  app.use((_req, _res, next) => { ready.then(() => next(), next); });
+}
 app.use(session({
   name: "byte.sid",
   secret: process.env.SESSION_SECRET || "development-only-session-secret-change-me",
@@ -55,7 +61,7 @@ async function start() {
   await store.sync();
   app.listen(port, "0.0.0.0", () => console.log("The Byte listening on port " + port));
 }
-if (require.main === module) {
+if (require.main === module && !process.env.VERCEL) {
   start().catch((error) => { console.error("Unable to start the application:", error); process.exit(1); });
 }
-module.exports = { app, start };
+module.exports = app;
