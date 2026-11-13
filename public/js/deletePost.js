@@ -1,27 +1,10 @@
-async function deleteFormHandler(event) {
-  event.preventDefault();
-
-  const id = window.location.toString().split("/")[
-    window.location.toString().split("/").length - 1
-  ];
-
-  const response = await fetch(`/api/posts/${id}`, {
-    method: "DELETE",
-    body: JSON.stringify({
-      post_id: id,
-    }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (response.ok) {
-    document.location.replace("/dashboard/");
-  } else {
-    alert(response.statusText);
-  }
-}
-
-document
-  .querySelector(".delete-post-btn")
-  .addEventListener("click", deleteFormHandler);
+document.querySelector(".delete-post-btn")?.addEventListener("click", async (event) => {
+  const button = event.currentTarget;
+  if (!window.confirm("Permanently delete this story and all its comments? This cannot be undone.")) return;
+  button.disabled = true;
+  try {
+    const response = await fetch("/api/posts/" + encodeURIComponent(button.dataset.postId), { method: "DELETE" });
+    if (!response.ok) { const data = await response.json(); throw new Error(data.message || "Unable to delete the story."); }
+    window.location.assign("/dashboard");
+  } catch (error) { alert(error.message); button.disabled = false; }
+});
