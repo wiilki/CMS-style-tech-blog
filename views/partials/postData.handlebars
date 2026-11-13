@@ -1,12 +1,6 @@
-<div class="card border-dark">
-
-    <div class="card-header bg-primary">
-        <h2> {{title}}</h2>
-        <p>Posted by {{user.username}} on {{format_date date_created}}</p>
-    </div>
-
-    <div class="card-body">
-        <p> {{description}}</p>
-    </div>
-
-</div>
+<article class="story-card" data-date="{{iso_date date_created}}" data-search="{{title}} {{description}} {{user.username}}">
+  <a class="story-card-link" href="/posts/{{id}}" aria-label="Read {{title}}">
+    <div class="story-visual story-visual-{{card_color id}}"><span class="visual-grid" aria-hidden="true"></span><span class="story-visual-symbol" aria-hidden="true">{{card_symbol id}}</span><span class="visual-caption">THE BYTE / NOTES {{id}}</span></div>
+    <div class="story-content"><div class="story-meta"><span class="story-category">DEVELOPMENT</span><span>{{reading_time description}} MIN READ</span></div><h3>{{title}}</h3><p>{{excerpt description 135}}</p><div class="story-card-footer"><span class="story-author"><span class="avatar avatar-small">{{initial user.username}}</span>{{user.username}}</span><span class="story-arrow" aria-hidden="true">↗</span></div></div>
+  </a>
+</article>

@@ -1,18 +1,1 @@
-<a href="/dashboard">Go back</a>
-
-<h2>New Post:</h2>
-
-<form class="new-post-form">
-  <div>
-    <label for="post-title">Title:</label>
-    <input class="input" type="text" id="post-title" name="post-title" placeholder="insert title here" />
-  </div>
-  <div>
-    <label for="post-content">Content:</label>
-    <input class="textarea is-large" id="post-content" name="post-content" placeholder="insert content here" />
-  </div>
-  <button class="new-post-btn" type="submit">+ New Post</button>
-</form>
-
-
-<script src="/js/newPost.js"></script>
+<div class="container editor-page"><a href="/dashboard" class="back-link">← Back to studio</a><div class="editor-heading"><div class="eyebrow"><span class="pulse-dot"></span> THE WRITING STUDIO</div><h1>Tell your story<span class="accent-period">.</span></h1><p>Start with an idea. Make it yours.</p></div><div class="editor-grid"><form class="new-post-form editor-form" novalidate><div class="field"><label for="post-title">STORY TITLE <span>*</span></label><input type="text" id="post-title" name="post-title" maxlength="150" minlength="3" placeholder="Give your idea a compelling headline" required autofocus></div><div class="field"><div class="field-heading"><label for="post-content">YOUR STORY <span>*</span></label><span id="word-count">0 words</span></div><textarea id="post-content" name="post-content" rows="16" minlength="10" maxlength="50000" placeholder="What have you learned, built, or discovered? Share your experience…" required></textarea></div><p class="form-message" role="alert" hidden></p><div class="editor-actions"><button class="button button-primary" type="submit">Publish story ↗</button><a class="button button-quiet" href="/dashboard">Cancel</a></div></form><aside class="editor-sidebar"><span class="overline">A FEW WRITING TIPS</span><div class="tip-block"><span>01</span><div><h3>Hook your reader</h3><p>A clear, specific title makes all the difference.</p></div></div><div class="tip-block"><span>02</span><div><h3>Make it useful</h3><p>Examples, lessons, and practical details bring your story to life.</p></div></div><div class="tip-block"><span>03</span><div><h3>Keep it human</h3><p>Your perspective is what makes this worth reading.</p></div></div><div class="editor-tip-art" aria-hidden="true">&lt; / &gt;</div></aside></div></div><script src="/js/newPost.js"></script><script src="/js/editor.js"></script>

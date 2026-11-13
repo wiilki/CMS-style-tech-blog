@@ -1,18 +1,8 @@
-<h2>Your Posts</h2>
-
-{{#if posts.length}}
-<div>
-    {{#each posts as |post|}}
-    <a href="/dashboard/edit/{{post.id}}">
-        {{> postData post}}
-    </a>
-    {{/each}}
-
-    {{else}}
-    <h3>No Posts</h3>
+<div class="container dashboard-page">
+  <div class="dash-heading"><div><div class="eyebrow"><span class="pulse-dot"></span> YOUR CREATIVE SPACE</div><h1>Your writing studio<span class="accent-period">.</span></h1><p>Every great idea deserves a place to land. Manage your stories here.</p></div><a class="button button-primary" href="/dashboard/create">+ Create a new story</a></div>
+  <div class="stats-row"><div class="stat-card"><span>YOUR STORIES</span><strong>{{posts.length}}</strong><small>Published to the journal</small></div><div class="stat-card stat-card-accent"><span>YOUR SPACE</span><strong>∞</strong><small>Ideas waiting to happen</small></div><div class="stat-note"><span class="note-star">✳</span><p>“The best way to learn is to build, and the best way to grow is to share.”</p></div></div>
+  <div class="dashboard-content"><div class="section-topline"><div><span class="overline">YOUR LIBRARY</span><h2>Published stories<span class="accent-period">.</span></h2></div></div>
+    {{#if posts.length}}<div class="dashboard-list">{{#each posts as |post|}}<article class="dashboard-item"><div class="dashboard-mini-art story-visual-{{card_color post.id}}">{{card_symbol post.id}}</div><div class="dashboard-item-text"><span class="story-category">{{format_date post.date_created}} · {{reading_time post.description}} MIN READ</span><h3><a href="/posts/{{post.id}}">{{post.title}}</a></h3><p>{{excerpt post.description 110}}</p></div><div class="dashboard-item-actions"><a class="button button-outline button-small" href="/dashboard/edit/{{post.id}}">Edit story ↗</a><a class="read-link" href="/posts/{{post.id}}">View</a></div></article>{{/each}}</div>
+    {{else}}<div class="empty-state dash-empty"><div class="empty-icon">✎</div><h3>Your next story starts here.</h3><p>You haven’t published anything yet. The blank page is full of possibility.</p><a class="button button-primary" href="/dashboard/create">Create your first story ↗</a></div>{{/if}}
+  </div>
 </div>
-{{/if}}
-
-<a href="/dashboard/create/"><button id="create-post">+ New Post</button></a>
-
-<script src="/js/editPost.js"></script>
