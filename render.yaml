@@ -1,0 +1,25 @@
+# Render Blueprint — deploy The Byte with a Node web service and Postgres.
+# Render's free PostgreSQL expires after 30 days and has no backups.
+# Upgrade or move to a permanent database before publishing valuable content.
+services:
+  - type: web
+    name: the-byte-tech-blog
+    runtime: node
+    plan: free
+    buildCommand: npm install --no-audit --no-fund
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: the-byte-db
+          property: connectionString
+databases:
+  - name: the-byte-db
+    plan: free
+    databaseName: thebyte
+    user: thebyte
