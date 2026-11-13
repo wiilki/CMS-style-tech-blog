@@ -16,6 +16,7 @@ if (production && (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.len
 
 const hbs = exphbs.create({ helpers });
 const store = new SequelizeStore({ db: sequelize });
+const ensureStorageReady = require("./utils/storageReady")({ sequelize, store });
 app.disable("x-powered-by");
 if (production) app.set("trust proxy", 1);
 app.engine("handlebars", hbs.engine);
@@ -25,8 +26,7 @@ app.use(express.urlencoded({ extended: false, limit: "100kb" }));
 // Vercel imports the Express app as a serverless handler. Wait for storage
 // initialization before its session middleware handles the first request.
 if (process.env.VERCEL) {
-  const ready = sequelize.authenticate().then(() => sequelize.sync()).then(() => store.sync());
-  app.use((_req, _res, next) => { ready.then(() => next(), next); });
+  app.use((_req, _res, next) => { ensureStorageReady().then(() => next(), next); });
 }
 app.use(session({
   name: "byte.sid",
@@ -56,9 +56,7 @@ app.use((error, req, res, _next) => {
 });
 
 async function start() {
-  await sequelize.authenticate();
-  await sequelize.sync();
-  await store.sync();
+  await ensureStorageReady();
   app.listen(port, "0.0.0.0", () => console.log("The Byte listening on port " + port));
 }
 if (require.main === module && !process.env.VERCEL) {
