@@ -1,134 +1,47 @@
 const router = require("express").Router();
-const { User, Post, Comment } = require("../../models");
-const withAuth = require("../../utils/auth");
+const { User } = require("../../models");
+const { validateSignup } = require("../../utils/validation");
 
-router.get("/", (req, res) => {
-  User.findAll({
-    attributes: { exclude: ["password"] },
-  })
-    .then((userData) => res.json(userData))
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json(err);
-    });
-});
-
-router.post("/", (req, res) => {
-  User.create({
-    username: req.body.username,
-    password: req.body.password,
-  }).then((userData) => {
-    req.session.save(() => {
-      req.session.user_id = userData.id;
+router.post("/", async (req, res, next) => {
+  const data = validateSignup(req.body);
+  if (!data.valid) return res.status(400).json({ message: data.message });
+  try {
+    const existing = await User.findOne({ where: { username: data.username } });
+    if (existing) return res.status(409).json({ message: "This username is already taken. Try another." });
+    const user = await User.create({ username: data.username, password: data.password });
+    req.session.regenerate((error) => {
+      if (error) return next(error);
+      req.session.user_id = user.id;
+      req.session.username = user.username;
       req.session.loggedIn = true;
-
-      res.json(userData);
+      req.session.save((saveError) => saveError ? next(saveError) : res.status(201).json({ id: user.id, username: user.username }));
     });
-  });
-});
-
-router.get("/:id", (req, res) => {
-  User.findOne({
-    attributes: { exclude: ["password"] },
-    where: { id: req.params.id },
-    include: [
-      { model: Post },
-      {
-        model: Comment,
-        include: { model: Post },
-      },
-    ],
-  })
-    .then((userData) => {
-      if (!userData) {
-        res.status(404).json({ message: "No user found with this id" });
-        return;
-      }
-      res.json(userData);
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json(err);
-    });
-});
-
-router.put("/:id", withAuth, (req, res) => {
-  User.update(req.body, {
-    individualHooks: true,
-    where: {
-      id: req.params.id,
-    },
-  })
-    .then((userData) => {
-      if (!userData[0]) {
-        res.status(404).json({ message: "No user found with this id" });
-        return;
-      }
-      res.json(userData);
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json(err);
-    });
-});
-
-router.delete("/:id", withAuth, (req, res) => {
-  User.destroy({
-    where: {
-      id: req.params.id,
-    },
-  })
-    .then((userData) => {
-      if (!userData) {
-        res.status(404).json({ message: "No user found with this id" });
-        return;
-      }
-      res.json(userData);
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json(err);
-    });
-});
-
-router.post("/login", (req, res) => {
-  User.findOne({
-    where: {
-      username: req.body.username,
-    },
-  }).then((userData) => {
-    if (!userData) {
-      res.status(400).json({ message: "No user with that username address!" });
-      return;
-    }
-
-    const password = userData.checkPassword(req.body.password);
-
-    if (!password) {
-      res.status(400).json({ message: "Incorrect password!" });
-      return;
-    }
-
-    req.session.save(() => {
-      req.session.user_id = userData.id;
-      req.session.username = userData.username;
-      req.session.loggedIn = true;
-
-      res.json({ user: userData, message: "You are now logged in!" });
-    });
-  });
-});
-
-router.post("/logout", (req, res) => {
-  if (req.session.loggedIn) {
-    req.session.destroy(() => {
-      res.status(204).end();
-    });
-  } else {
-    res.status(404).end();
+  } catch (error) {
+    if (error.name === "SequelizeUniqueConstraintError") return res.status(409).json({ message: "This username is already taken. Try another." });
+    next(error);
   }
 });
-
-
-
+router.post("/login", async (req, res, next) => {
+  const username = typeof req.body?.username === "string" ? req.body.username.trim() : "";
+  const password = typeof req.body?.password === "string" ? req.body.password : "";
+  if (!username || !password) return res.status(400).json({ message: "Enter your username and password." });
+  try {
+    const user = await User.findOne({ where: { username } });
+    if (!user || !user.checkPassword(password)) return res.status(401).json({ message: "Incorrect username or password." });
+    req.session.regenerate((error) => {
+      if (error) return next(error);
+      req.session.user_id = user.id;
+      req.session.username = user.username;
+      req.session.loggedIn = true;
+      req.session.save((saveError) => saveError ? next(saveError) : res.json({ id: user.id, username: user.username }));
+    });
+  } catch (error) { next(error); }
+});
+router.post("/logout", (req, res, next) => {
+  req.session.destroy((error) => {
+    if (error) return next(error);
+    res.clearCookie("byte.sid");
+    res.status(204).end();
+  });
+});
 module.exports = router;
