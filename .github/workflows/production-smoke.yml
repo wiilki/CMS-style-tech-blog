@@ -1,0 +1,55 @@
+name: Production HTTP smoke test
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Verify production serves its database-backed routes
+        shell: bash
+        env:
+          BASE_URL: https://cms-style-tech-blog.vercel.app
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 24); do
+            status=$(curl -sS -L --connect-timeout 5 --max-time 18 -o health.json -w '%{http_code}' "$BASE_URL/health" || true)
+            if [[ "$status" == "200" ]] && grep -Eq '"ok"[[:space:]]*:[[:space:]]*true' health.json; then
+              echo "Health endpoint OK on attempt $attempt"
+              break
+            fi
+            if [[ "$attempt" -eq 24 ]]; then
+              echo "Health endpoint failed: status $status"
+              head -c 500 health.json || true
+              exit 1
+            fi
+            sleep 5
+          done
+
+          for path in / /login /signup /api/posts /api/comments; do
+            status=$(curl -sS -L --connect-timeout 5 --max-time 18 -o response.txt -w '%{http_code}' "$BASE_URL$path")
+            echo "$path: HTTP $status"
+            if [[ "$status" != 200 ]]; then
+              head -c 500 response.txt || true
+              exit 1
+            fi
+            if [[ "$path" == "/" ]] && ! grep -qi "The Byte" response.txt; then
+              echo "Homepage does not contain The Byte branding"
+              exit 1
+            fi
+          done
+
+          status=$(curl -sS -L --connect-timeout 5 --max-time 18 -o unauthorized.json -w '%{http_code}' \
+            -H 'Content-Type: application/json' -d '{}' "$BASE_URL/api/posts")
+          echo "Unauthenticated publishing: HTTP $status"
+          if [[ "$status" != 401 ]]; then
+            echo "Anonymous publishing was not properly denied"
+            exit 1
+          fi
