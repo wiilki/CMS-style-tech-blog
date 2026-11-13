@@ -1,31 +1,17 @@
-async function editFormHandler(event) {
-    event.preventDefault();
-  
-    const title = document.querySelector('input[name="post-title"]').value;
-    const description = document.querySelector('input[name="post-content"]').value;
-    
-    const id = window.location.toString().split('/')[
-        window.location.toString().split('/').length - 1
-      ];
-
-    const response = await fetch(`/api/posts/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-            title,
-            description
-        }),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-      });
-      
-      if (response.ok) {
-        document.location.replace('/dashboard/');
-      } else {
-        alert(response.statusText);
-      }
-  }
-  
-  document
-  .querySelector('.edit-post-form')
-  .addEventListener('submit', editFormHandler);
+document.querySelector(".edit-post-form")?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const id = form.dataset.postId;
+  const title = form.elements["post-title"].value.trim();
+  const description = form.elements["post-content"].value.trim();
+  const message = form.querySelector(".form-message");
+  const button = form.querySelector('button[type="submit"]');
+  if (title.length < 3 || description.length < 10) { message.textContent = "Please add a title (3+ characters) and story (10+ characters)."; message.hidden = false; return; }
+  button.disabled = true; message.hidden = true;
+  try {
+    const response = await fetch("/api/posts/" + encodeURIComponent(id), { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title, description }) });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Unable to save changes.");
+    window.location.assign("/dashboard");
+  } catch (error) { message.textContent = error.message; message.hidden = false; button.disabled = false; }
+});

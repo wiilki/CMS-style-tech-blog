@@ -1,79 +1,37 @@
 const router = require("express").Router();
-const sequelize = require("../config/connection");
 const { Post, User, Comment } = require("../models");
 
-router.get("/", (req, res) => {
-  console.log(req.session);
+const postIncludes = [
+  { model: User, attributes: ["id", "username"] },
+  { model: Comment, include: [{ model: User, attributes: ["id", "username"] }], order: [["date_created", "ASC"]] },
+];
 
-  Post.findAll({
-    include: [
-      {
-        model: Comment,
-        include: { model: User },
-      },
-      { model: User },
-    ],
-  })
-    .then((postData) => {
-      const posts = postData.map((post) => post.get({ plain: true }));
-
-      res.render("homepage", {
-        posts,
-        loggedIn: req.session.loggedIn,
-      });
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json(err);
-    });
+router.get("/", async (req, res, next) => {
+  try {
+    const records = await Post.findAll({ include: [{ model: User, attributes: ["id", "username"] }], order: [["date_created", "DESC"]] });
+    const posts = records.map((post) => post.get({ plain: true }));
+    res.render("homepage", { posts, featured: posts[0], isHome: true, loggedIn: Boolean(req.session.loggedIn), pageTitle: "Explore" });
+  } catch (error) { next(error); }
 });
 
-router.get("/posts/:id", (req, res) => {
-  Post.findOne({
-    where: { id: req.params.id },
-    include: [
-      {
-        model: Comment,
-        include: { model: User },
-      },
-      { model: User },
-    ],
-  })
-    .then((postData) => {
-      if (!postData) {
-        res.status(404).json({ message: "No post found with this id" });
-        return;
-      }
-
-      const post = postData.get({ plain: true });
-
-      res.render("newComment", {
-        post,
-        loggedIn: req.session.loggedIn,
-      });
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json(err);
-    });
+router.get("/posts/:id", async (req, res, next) => {
+  try {
+    if (!/^[1-9]\d*$/.test(req.params.id)) return res.status(404).render("notFound", { pageTitle: "Story not found" });
+    const record = await Post.findOne({ where: { id: req.params.id }, include: postIncludes });
+    if (!record) return res.status(404).render("notFound", { pageTitle: "Story not found", loggedIn: Boolean(req.session.loggedIn) });
+    const post = record.get({ plain: true });
+    post.comments = post.comments.sort((a, b) => new Date(a.date_created) - new Date(b.date_created));
+    res.render("newComment", { post, loggedIn: Boolean(req.session.loggedIn), pageTitle: post.title });
+  } catch (error) { next(error); }
 });
 
 router.get("/login", (req, res) => {
-  if (req.session.loggedIn) {
-    res.redirect("/");
-    return;
-  }
-
-  res.render("login");
+  if (req.session.loggedIn) return res.redirect("/dashboard");
+  res.render("login", { pageTitle: "Log in" });
 });
-
 router.get("/signup", (req, res) => {
-  if (req.session.loggedIn) {
-    res.redirect("/");
-    return;
-  }
-
-  res.render("signup");
+  if (req.session.loggedIn) return res.redirect("/dashboard");
+  res.render("signup", { pageTitle: "Join" });
 });
 
 module.exports = router;

@@ -1,112 +1,24 @@
-const router = require('express').Router();
-const sequelize = require('../config/connection');
-const { Post, User, Comment } = require('../models');
-const withAuth = require('../utils/auth');
+const router = require("express").Router();
+const { Post } = require("../models");
+const withAuth = require("../utils/auth");
 
-router.get('/', withAuth, (req, res) => {
-  Post.findAll({
-    where: {
-      // use the ID from the session
-      user_id: req.session.user_id
-    },
-    attributes: [
-      'id',
-      'title',
-      'date_created',
-      'description'
-    ],
-    include: [
-      {
-        model: Comment,
-        attributes: ['id', 'body', 'post_id', 'user_id', 'date_created'],
-        include: {
-          model: User,
-          attributes: ['username']
-        }
-      },
-      {
-        model: User,
-        attributes: ['username']
-      }
-    ]
-  })
-    .then(postData => {
-      const posts = postData.map(post => post.get({ plain: true }));
-      res.render('dashboard', { posts, loggedIn: true });
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json(err);
-    });
+router.use(withAuth);
+router.get("/", async (req, res, next) => {
+  try {
+    const records = await Post.findAll({ where: { user_id: req.session.user_id }, order: [["date_created", "DESC"]] });
+    const posts = records.map((post) => post.get({ plain: true }));
+    res.render("dashboard", { posts, loggedIn: true, isDashboard: true, pageTitle: "Writing studio" });
+  } catch (error) { next(error); }
 });
-
-router.get('/create/', withAuth, (req, res) => {
-  Post.findAll({
-    where: {
-      // use the ID from the session
-      user_id: req.session.user_id
-    },
-    attributes: [
-      'id',
-      'title',
-      'date_created',
-      'description'
-    ],
-    include: [
-      {
-        model: Comment,
-        attributes: ['id', 'body', 'post_id', 'user_id', 'date_created'],
-        include: {
-          model: User,
-          attributes: ['username']
-        }
-      },
-      {
-        model: User,
-        attributes: ['username']
-      }
-    ]
-  })
-    .then(postData => {
-      // serialize data before passing to template
-      const posts = postData.map(post => post.get({ plain: true }));
-      res.render('newPost', { posts, loggedIn: true });
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json(err);
-    });
+router.get("/create", (req, res) => {
+  res.render("newPost", { loggedIn: true, isDashboard: true, pageTitle: "New story" });
 });
-
-router.get('/edit/:id', withAuth, (req, res) => {
-  Post.findOne({
-    where: {
-      id: req.params.id
-    },
-    attributes: [
-      'id',
-      'title',
-      'description',
-      'date_created',
-    ]
-  })
-    .then(postData => {
-      if (!postData) {
-        res.status(404).json({ message: 'No post found with this id' });
-        return;
-      }
-
-      const post = postData.get({ plain: true });
-
-      res.render('editPost', {
-        post,
-        loggedIn: true
-      });
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json(err);
-    });
+router.get("/edit/:id", async (req, res, next) => {
+  try {
+    if (!/^[1-9]\d*$/.test(req.params.id)) return res.status(404).render("notFound", { loggedIn: true });
+    const record = await Post.findOne({ where: { id: req.params.id, user_id: req.session.user_id } });
+    if (!record) return res.status(404).render("notFound", { loggedIn: true, pageTitle: "Story not found" });
+    res.render("editPost", { post: record.get({ plain: true }), loggedIn: true, isDashboard: true, pageTitle: "Edit story" });
+  } catch (error) { next(error); }
 });
-
 module.exports = router;

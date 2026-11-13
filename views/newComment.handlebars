@@ -1,21 +1,11 @@
-{{> postData post}}
-
-{{> commentData post.comments}}
-
-{{#if loggedIn}}
-<div class="card border-dark">
-  <form class="comment-form">
-    <div>
-      <textarea name="comment-body"></textarea>
-    </div>
-
-    <div>
-      <button type="submit">Add Comment</button>
-    </div>
-  </form>
-</div>
-{{/if}}
-
-{{#if loggedIn}}
-<script src="/js/newComment.js"></script>
-{{/if}}
+<div class="container article-layout"><a href="/" class="back-link">← Back to all stories</a>
+<article class="article-page">
+  <div class="article-heading"><div class="eyebrow"><span class="pulse-dot"></span> THE BYTE / STORY {{post.id}}</div><h1>{{post.title}}</h1><div class="article-byline"><span class="avatar">{{initial post.user.username}}</span><div><strong>{{post.user.username}}</strong><span>{{format_date post.date_created}} · {{reading_time post.description}} min read</span></div></div></div>
+  <div class="article-cover story-visual-{{card_color post.id}}"><span class="cover-symbol" aria-hidden="true">{{card_symbol post.id}}</span><div class="cover-inscription">IDEAS // ENGINEERING // CULTURE</div></div>
+  <div class="article-body">{{post.description}}</div>
+  <div class="article-end"><span>THE END <span aria-hidden="true">✳</span></span><a href="/">Discover more stories ↗</a></div>
+</article>
+<section class="comments-section" id="comments"><div class="comments-title"><div><span class="overline">KEEP THE CONVERSATION GOING</span><h2>Discussion <span class="comment-count">({{post.comments.length}})</span></h2></div></div>
+{{#if post.comments.length}}<div class="comments-list">{{> commentData post.comments}}</div>{{else}}<p class="comments-empty">No comments yet. Be the first to share a perspective.</p>{{/if}}
+{{#if loggedIn}}<form class="comment-form" novalidate><label for="comment-body">Add your perspective</label><textarea id="comment-body" name="comment-body" maxlength="240" minlength="2" placeholder="What did this get you thinking about?" required></textarea><div class="form-bottom"><span>Keep it kind, constructive, and on topic.</span><button class="button button-primary" type="submit">Post comment ↗</button></div><p class="form-message" role="alert" hidden></p></form><script src="/js/newComment.js"></script>{{else}}<div class="comment-signin"><p>Want to join this discussion?</p><a href="/login" class="button button-primary">Log in to comment ↗</a></div>{{/if}}
+</section></div>

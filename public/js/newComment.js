@@ -1,32 +1,16 @@
-async function commentFormHandler(event) {
+document.querySelector(".comment-form")?.addEventListener("submit", async (event) => {
   event.preventDefault();
-
-  const body = document.querySelector('textarea[name="comment-body"]').value.trim();
-
-  const post_id = window.location.toString().split("/")[
-    window.location.toString().split("/").length - 1
-  ];
-
-  if (body) {
-    const response = await fetch("/api/comments", {
-      method: "POST",
-      body: JSON.stringify({
-        post_id,
-        body,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (response.ok) {
-      document.location.reload();
-    } else {
-      alert(response.statusText);
-    }
-  }
-}
-
-document
-  .querySelector(".comment-form")
-  .addEventListener("submit", commentFormHandler);
+  const form = event.currentTarget;
+  const body = form.elements["comment-body"].value.trim();
+  const message = form.querySelector(".form-message");
+  const button = form.querySelector('button[type="submit"]');
+  const post_id = window.location.pathname.split("/").filter(Boolean).pop();
+  if (body.length < 2) { message.textContent = "Please write at least two characters."; message.hidden = false; return; }
+  button.disabled = true; message.hidden = true;
+  try {
+    const response = await fetch("/api/comments", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ post_id, body }) });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || "Unable to post comment.");
+    window.location.reload();
+  } catch (error) { message.textContent = error.message; message.hidden = false; button.disabled = false; }
+});
